@@ -1,25 +1,45 @@
 package skool.saas.skool.GLOBALE.config;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.logging.Logger;
 
 @Component
 public class JwtUtil {
-    private final String SECRET_KEY = "secret_key_example"; // À remplacer par une clé forte
+
+    private static final Logger LOGGER = Logger.getLogger(JwtUtil.class.getName());
+
+    @Value("${jwt.secret}")
+    private String secret;
+
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 
     public String generateToken(String email, String role) {
-        long expirationTime = 86400000; // 24h en ms
-        return Jwts.builder()
-                .setSubject(email)
-                .claim("role", role)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
-                .compact();
+        long expirationTime = 86400000; // 24h
+        try {
+            String token = Jwts.builder()
+                    .setSubject(email)
+                    .claim("role", role)
+                    .setIssuedAt(new Date())
+                    .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                    .signWith(getSigningKey(), SignatureAlgorithm.HS512)
+                    .compact();
+            System.out.println("✅ Token généré : " + token);
+            return token;
+        } catch (Exception e) {
+            System.err.println("❌ Erreur lors de la génération du token : " + e.getMessage());
+            throw e;
+        }
     }
 
     public String extractEmail(String token) {
@@ -34,12 +54,31 @@ public class JwtUtil {
         try {
             getClaims(token);
             return true;
-        } catch (Exception e) {
+        } catch (JwtException e) {
+            LOGGER.warning("❌ Token invalide : " + e.getMessage());
             return false;
         }
     }
 
     private Claims getClaims(String token) {
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    @PostConstruct
+    public void validateKey() {
+        try {
+            SecretKey key = getSigningKey();
+            int size = key.getEncoded().length;
+            LOGGER.info("✅ Clé JWT chargée avec succès. Taille : " + size + " octets.");
+            if (size < 64) {
+                LOGGER.warning("⚠️ ATTENTION : La clé est trop courte pour HS512 (besoin de ≥ 64 octets).");
+            }
+        } catch (Exception e) {
+            LOGGER.severe("❌ Erreur de chargement de la clé JWT : " + e.getMessage());
+        }
     }
 }

@@ -55,13 +55,30 @@ public class UtilisateurController {
     public ResponseEntity<Map<String, Object>> login(@RequestBody Utilisateur utilisateur) {
         Map<String, Object> response = new HashMap<>();
 
+        // 👮 Vérifie d'abord si le rôle est bien présent
+        if (utilisateur.getRole() == null) {
+            response.put("success", false);
+            response.put("message", "Rôle manquant !");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        // 🔒 Licence valide ?
         if (!configurationService.licenceEstValide()) {
             response.put("success", false);
             response.put("message", "Licence expirée. Veuillez contacter l’administration.");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
         }
 
-        boolean isAuthenticated = utilisateurService.authenticate(utilisateur.getEmail(), utilisateur.getPassword(), utilisateur.getRole());
+        // 🧪 Affiche les infos pour debug
+        System.out.println("🧪 Email : " + utilisateur.getEmail());
+        System.out.println("🧪 Password : " + utilisateur.getPassword());
+        System.out.println("🧪 Role : " + utilisateur.getRole());
+
+        boolean isAuthenticated = utilisateurService.authenticate(
+                utilisateur.getEmail(),
+                utilisateur.getPassword(),
+                utilisateur.getRole()
+        );
 
         if (isAuthenticated) {
             String token = jwtUtil.generateToken(utilisateur.getEmail(), utilisateur.getRole().name());
