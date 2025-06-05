@@ -1,11 +1,11 @@
-package skool.saas.skool.A_PRIMAIRE.Entity;
+package skool.saas.skool.B_COLLEGE.Entity;
 
 import jakarta.persistence.*;
-import skool.saas.skool.A_PRIMAIRE.enums.ClassePRIMAIRE;
+import skool.saas.skool.B_COLLEGE.enums.ClasseCOLLEGE;
 
 @Entity
-@Table(name = "ScolaritePrimaire")
-public class Scolarite {
+@Table(name = "ScolariteScolarite")
+public class ScolariteCollege {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,7 +16,7 @@ public class Scolarite {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ClassePRIMAIRE classe;
+    private ClasseCOLLEGE classe;
 
 
     public Long getId() {
@@ -35,11 +35,11 @@ public class Scolarite {
         this.montant = montant;
     }
 
-    public ClassePRIMAIRE getClasse() {
+    public ClasseCOLLEGE getClasse() {
         return classe;
     }
 
-    public void setClasse(ClassePRIMAIRE classe) {
+    public void setClasse(ClasseCOLLEGE classe) {
         this.classe = classe;
     }
 

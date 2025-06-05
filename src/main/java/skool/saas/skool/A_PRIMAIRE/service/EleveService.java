@@ -114,6 +114,7 @@ public class EleveService {
         eleveRepository.deleteById(id);
     }
 
+
     public List<Eleve> getElevesByClasse(ClassePRIMAIRE classe) {
         return eleveRepository.findByClasse(classe);
     }

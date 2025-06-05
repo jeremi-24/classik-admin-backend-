@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import skool.saas.skool.A_PRIMAIRE.Entity.Scolarite;
 import skool.saas.skool.B_COLLEGE.Dto.CollegeStatistiqueDto;
 import skool.saas.skool.B_COLLEGE.Dto.EleveCollegeDto;
 import skool.saas.skool.B_COLLEGE.Dto.TuteurCollegeSimpleDto;
@@ -17,6 +18,7 @@ import skool.saas.skool.B_COLLEGE.service.EleveCollegeService;
 import skool.saas.skool.B_COLLEGE.service.TuteurCollegeService;
 
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -35,15 +37,31 @@ public class CollegeController {
 
 
     @Operation(summary = "Ajout d'un eleve ")
-    @PostMapping
+    @PostMapping("/eleve")
     public ResponseEntity<EleveCollege> ajouterEleve(@RequestBody EleveCollegeDto dto) {
        EleveCollege eleveCree = eleveCollegeService.ajouterEleveEtTuteur(dto);
         return ResponseEntity.ok(eleveCree);
     }
 
+    @Operation(summary = "modifier d'un eleve ")
+    @PutMapping("/eleve/{id}")
+    public ResponseEntity<EleveCollege> modifierEleveParId(
+            @PathVariable("id") Long id,
+            @RequestBody EleveCollegeDto dto) {
+
+        EleveCollege eleveMisAJour = eleveCollegeService.modifierEleveEtTuteur(id, dto);
+        return ResponseEntity.ok(eleveMisAJour);
+    }
+
+    @Operation(summary = "delete un eleve ")
+    @DeleteMapping("/eleve/{id}")
+    public ResponseEntity<Void> supprimerEleveParId(@PathVariable("id") Long id) {
+        eleveCollegeService.supprimerEleve(id);
+        return ResponseEntity.noContent().build();
+    }
 
     @Operation(summary = "Récupérer tous les tuteurs ")
-    @GetMapping
+    @GetMapping("/tuteur")
     public List<TuteurCollegeSimpleDto> getAllTuteurs() {
         return tuteurCollegeService.getAllTuteurs();
     }
@@ -81,7 +99,39 @@ public class CollegeController {
     }
 
 
+    @Operation(summary = "get un eleve par son id")
+    @GetMapping("/eleve/{id}")
+    public ResponseEntity<EleveCollegeDto> getEleveParId(@PathVariable Long id) {
+        EleveCollegeDto dto = eleveCollegeService.getEleveDtoById(id);
+        return ResponseEntity.ok(dto);
+    }
 
 
+    @Operation(summary = "Récupérer tous les classes")
+    @GetMapping("/classes")
+    public List<ClasseCOLLEGE> getAllClassesCollege() {
+        return Arrays.asList(ClasseCOLLEGE.values());
+    }
 
+
+//    // // // // // // // // // // // // // // // // // // // // // // //
+//    // // // // //// // //  Scolarité
+//    @Operation(summary = "ajout de scolarite")
+//    @PostMapping("/scolarite")
+//    public ResponseEntity<Scolarite> createScolarite(@RequestBody Scolarite scolarite) {
+//        Scolarite saved = scolariteService.saveScolarite(scolarite);
+//        return ResponseEntity.ok(saved);
+//    }
+//
+//    @Operation(summary = "put scolarite par son id")
+//    @PutMapping("/scolarite/{id}")
+//    public ResponseEntity<Scolarite> updateScolarite(
+//            @PathVariable Long id,
+//            @RequestParam Long montant) {
+//        Scolarite updated = scolariteService.updateScolarite(id, montant);
+//        return ResponseEntity.ok(updated);
+//    }
+
+
+    
 }

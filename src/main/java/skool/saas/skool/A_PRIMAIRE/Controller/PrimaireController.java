@@ -54,7 +54,9 @@ public class PrimaireController {
     }
     @Operation(summary = "modifier d'un eleve ")
     @PutMapping("/eleve/{id}")
-    public ResponseEntity<Eleve> modifierEleve(@PathVariable Long id, @RequestBody EleveDto dto) {
+    public ResponseEntity<Eleve> modifierEleve(
+            @PathVariable Long id,
+            @RequestBody EleveDto dto) {
         Eleve updated = eleveService.modifierEleve(id, dto);
         return ResponseEntity.ok(updated);
     }
@@ -105,12 +107,6 @@ public class PrimaireController {
         return eleveService.getElevesByClasse(classe);
     }
 
-    @Operation(summary = "get un eleve par son id")
-    @GetMapping("/eleve/{id}")
-    public EleveDto getEleveById(@PathVariable Long id) {
-        return eleveService.getEleveById(id);
-    }
-
 
     @Operation(summary = "Récupérer tous les classes")
     @GetMapping("/classes")
@@ -118,6 +114,12 @@ public class PrimaireController {
         return Arrays.stream(ClassePRIMAIRE.values())
                 .map(Enum::name)
                 .collect(Collectors.toList());
+    }
+
+    @Operation(summary = "get un eleve par son id")
+    @GetMapping("/eleve/{id}")
+    public EleveDto getEleveById(@PathVariable Long id) {
+        return eleveService.getEleveById(id);
     }
 
 
