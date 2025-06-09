@@ -8,6 +8,5 @@ import skool.saas.skool.B_COLLEGE.enums.ClasseCOLLEGE;
 import java.util.Optional;
 
 public interface ScolariteCollegeRepository extends JpaRepository<ScolariteCollege, Long> {
-    Optional<Scolarite> findByClasse(ClasseCOLLEGE classe);
-
+    Optional<ScolariteCollege> findByClasse(ClasseCOLLEGE classeCOLLEGE);
 }

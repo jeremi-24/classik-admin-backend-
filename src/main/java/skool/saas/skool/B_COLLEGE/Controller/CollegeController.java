@@ -12,9 +12,11 @@ import skool.saas.skool.B_COLLEGE.Dto.CollegeStatistiqueDto;
 import skool.saas.skool.B_COLLEGE.Dto.EleveCollegeDto;
 import skool.saas.skool.B_COLLEGE.Dto.TuteurCollegeSimpleDto;
 import skool.saas.skool.B_COLLEGE.Entity.EleveCollege;
+import skool.saas.skool.B_COLLEGE.Entity.ScolariteCollege;
 import skool.saas.skool.B_COLLEGE.Entity.TuteurCollege;
 import skool.saas.skool.B_COLLEGE.enums.ClasseCOLLEGE;
 import skool.saas.skool.B_COLLEGE.service.EleveCollegeService;
+import skool.saas.skool.B_COLLEGE.service.ScolariteCollegeService;
 import skool.saas.skool.B_COLLEGE.service.TuteurCollegeService;
 
 
@@ -35,6 +37,8 @@ public class CollegeController {
     @Autowired
     private TuteurCollegeService tuteurCollegeService;
 
+    @Autowired
+    private ScolariteCollegeService scolariteCollegeService;
 
     @Operation(summary = "Ajout d'un eleve ")
     @PostMapping("/eleve")
@@ -114,24 +118,33 @@ public class CollegeController {
     }
 
 
-//    // // // // // // // // // // // // // // // // // // // // // // //
-//    // // // // //// // //  Scolarité
-//    @Operation(summary = "ajout de scolarite")
-//    @PostMapping("/scolarite")
-//    public ResponseEntity<Scolarite> createScolarite(@RequestBody Scolarite scolarite) {
-//        Scolarite saved = scolariteService.saveScolarite(scolarite);
-//        return ResponseEntity.ok(saved);
-//    }
-//
-//    @Operation(summary = "put scolarite par son id")
-//    @PutMapping("/scolarite/{id}")
-//    public ResponseEntity<Scolarite> updateScolarite(
-//            @PathVariable Long id,
-//            @RequestParam Long montant) {
-//        Scolarite updated = scolariteService.updateScolarite(id, montant);
-//        return ResponseEntity.ok(updated);
-//    }
+    // // // // // // // // // // // // // // // // // // // // // // //
+    // // // // //// // //  Scolarité
+    @Operation(summary = "ajout de scolarite")
+    @PostMapping("/scolarite")
+    public ResponseEntity<ScolariteCollege> createScolarite(@RequestBody ScolariteCollege scolarite) {
+        ScolariteCollege saved = scolariteCollegeService.saveScolarite(scolarite);
+        return ResponseEntity.ok(saved);
+    }
 
+    @Operation(summary = "put scolarite par son id")
+    @PutMapping("/scolarite/{id}")
+    public ResponseEntity<ScolariteCollege> updateScolarite(@PathVariable Long id, @RequestBody Long montant) {
+        ScolariteCollege updated = scolariteCollegeService.updateScolarite(id, montant);
+        return ResponseEntity.ok(updated);
+    }
+
+    @Operation(summary = "get les scolarites")
+    @GetMapping("/scolarite")
+    public ResponseEntity<List<ScolariteCollege>> getAllScolarites() {
+        return ResponseEntity.ok(scolariteCollegeService.getAll());
+    }
+
+    @Operation(summary = "get scolarite by classe")
+    @GetMapping("/scolarite/{classe}")
+    public ResponseEntity<ScolariteCollege> getByClasse(@PathVariable ClasseCOLLEGE classe) {
+        return ResponseEntity.ok(scolariteCollegeService.getByClasse(classe));
+    }
 
     
 }

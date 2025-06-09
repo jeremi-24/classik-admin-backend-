@@ -12,6 +12,7 @@ import skool.saas.skool.A_PRIMAIRE.Dto.EleveDto;
 import skool.saas.skool.A_PRIMAIRE.Dto.PaiementDto;
 import skool.saas.skool.A_PRIMAIRE.Dto.TuteurSimpleDto;
 import skool.saas.skool.A_PRIMAIRE.Entity.Eleve;
+import skool.saas.skool.A_PRIMAIRE.Entity.Matiere;
 import skool.saas.skool.A_PRIMAIRE.Entity.Professeur;
 import skool.saas.skool.A_PRIMAIRE.Entity.Scolarite;
 import skool.saas.skool.A_PRIMAIRE.enums.ClassePRIMAIRE;
@@ -21,6 +22,7 @@ import skool.saas.skool.GLOBALE.enums.Role;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -45,6 +47,9 @@ public class PrimaireController {
 
     @Autowired
     private PaiementService paiementService;
+
+    @Autowired
+    private MatiereService matiereService;
 
     @Operation(summary = "Ajout d'un eleve ")
     @PostMapping("/eleve")
@@ -192,6 +197,36 @@ public class PrimaireController {
     public ResponseEntity<PaiementDto> getPaiementParEleve(@PathVariable Long eleveId) {
         PaiementDto dto = paiementService.getPaiementParEleveId(eleveId);
         return ResponseEntity.ok(dto);
+    }
+
+
+    // // // // // // // // // // // // // // // // // // // // // // //
+    // // // // //// // //  Matiere
+    @Operation(summary = "get les matieres ")
+    @GetMapping("/matiere")
+    public Map<String, Object> getAllMatieres() {
+        return matiereService.getAllMatieres();
+    }
+
+    @Operation(summary = "add matiere ")
+    @PostMapping("/matiere")
+    public ResponseEntity<Matiere> createMatiere(@RequestBody Matiere matiere) {
+        Matiere saved = matiereService.createMatiere(matiere);
+        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "put matiere ")
+    @PutMapping("/matiere/{id}")
+    public ResponseEntity<Matiere> updateMatiere(@PathVariable Long id, @RequestBody Matiere matiereDetails) {
+        Matiere updated = matiereService.updateMatiere(id, matiereDetails);
+        return ResponseEntity.ok(updated);
+    }
+
+    @Operation(summary = "delete matiere ")
+    @DeleteMapping("/matiere/{id}")
+    public ResponseEntity<Void> deleteMatiere(@PathVariable Long id) {
+        matiereService.deleteMatiere(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

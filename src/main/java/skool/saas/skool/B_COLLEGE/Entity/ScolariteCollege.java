@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import skool.saas.skool.B_COLLEGE.enums.ClasseCOLLEGE;
 
 @Entity
-@Table(name = "ScolariteScolarite")
+@Table(name = "scolarite_college") // nom de table plus clair
 public class ScolariteCollege {
 
     @Id
@@ -15,10 +15,10 @@ public class ScolariteCollege {
     private Long montant;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private ClasseCOLLEGE classe;
 
-
+    // --- Getters & Setters ---
     public Long getId() {
         return id;
     }
@@ -42,5 +42,4 @@ public class ScolariteCollege {
     public void setClasse(ClasseCOLLEGE classe) {
         this.classe = classe;
     }
-
 }
