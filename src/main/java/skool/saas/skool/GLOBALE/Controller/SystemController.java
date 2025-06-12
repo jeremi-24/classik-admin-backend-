@@ -14,7 +14,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
 @RequestMapping("/system")
-@CrossOrigin(origins = "http://localhost:3000")
 public class SystemController {
 
     @Autowired

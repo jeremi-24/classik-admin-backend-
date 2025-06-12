@@ -5,6 +5,8 @@ package skool.saas.skool.GLOBALE.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import skool.saas.skool.GLOBALE.Entity.Utilisateur;
 import skool.saas.skool.GLOBALE.enums.Role;
@@ -70,4 +72,16 @@ public class UtilisateurService {
         return utilisateurRepository.findAll();
     }
 
+
+    public Utilisateur getUtilisateurConnecte() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+            return null;
+        }
+
+        String email = authentication.getName(); 
+
+        return utilisateurRepository.findByEmail(email);
+    }
 }

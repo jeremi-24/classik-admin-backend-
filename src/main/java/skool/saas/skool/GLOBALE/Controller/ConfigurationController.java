@@ -15,7 +15,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/configuration")
-@CrossOrigin(origins = "http://localhost:3000")
 public class ConfigurationController {
 
     @Autowired

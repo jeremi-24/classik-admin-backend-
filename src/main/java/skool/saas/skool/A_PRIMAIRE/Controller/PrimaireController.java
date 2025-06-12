@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/Primaire")
-@CrossOrigin(origins = "http://localhost:3000")
 
 @Tag(name = "Primaire", description = "Gestion du system PRIMAIRE")
 

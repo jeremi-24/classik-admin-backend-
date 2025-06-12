@@ -18,8 +18,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = "http://localhost:3000")
-
 @Tag(name = "Utilisateur", description = "Gestion des utilisateurs")
 
 public class UtilisateurController {
@@ -125,6 +123,18 @@ public class UtilisateurController {
             return ResponseEntity.ok(role);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Rôle introuvable");
+        }
+    }
+
+
+    @Operation(summary = "Obtenir l'utilisateur connecté")
+    @GetMapping("/info")
+    public ResponseEntity<?> getUtilisateurConnecte() {
+        Utilisateur utilisateur = utilisateurService.getUtilisateurConnecte();
+        if (utilisateur != null) {
+            return ResponseEntity.ok(utilisateur);
+        } else {
+            return ResponseEntity.status(401).body("Aucun utilisateur connecté");
         }
     }
 
