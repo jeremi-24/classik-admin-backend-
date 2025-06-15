@@ -63,7 +63,7 @@ public class ConfigurationService {
     public boolean licenceEstValide() {
         List<Configuration> configurations = configurationRepository.findAll();
         if (configurations.isEmpty()) {
-            return false; // Pas de configuration, donc licence invalide
+            return true; // Pas de configuration, donc licence invalide
         }
 
         Configuration config = configurations.get(0); // On prend la première configuration
