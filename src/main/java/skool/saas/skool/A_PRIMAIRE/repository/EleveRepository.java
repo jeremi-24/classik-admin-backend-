@@ -13,5 +13,6 @@ public interface EleveRepository extends JpaRepository<Eleve, Long> {
     long countByClasseAndSexeIgnoreCase(ClassePRIMAIRE classe, String sexe);
     long countByClasse(ClassePRIMAIRE classe);
     Optional<Eleve> findById(Long id);
+    Optional<Eleve> findByNomAndPrenom(String nom, String prenom);
 
 }

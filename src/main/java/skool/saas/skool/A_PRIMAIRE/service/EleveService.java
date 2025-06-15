@@ -13,6 +13,8 @@ import skool.saas.skool.A_PRIMAIRE.Entity.Tuteur;
 import skool.saas.skool.A_PRIMAIRE.enums.ClassePRIMAIRE;
 import skool.saas.skool.A_PRIMAIRE.repository.EleveRepository;
 import skool.saas.skool.A_PRIMAIRE.repository.TuteurRepository;
+import skool.saas.skool.GLOBALE.Entity.AnneeContext;
+import skool.saas.skool.GLOBALE.Entity.AnneeScolaire;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +67,11 @@ public class EleveService {
         eleve.setPhoto(dto.getPhoto());
 
         eleve.setTuteur(tuteur);
+
+        // 👇 C’est ici que tu ajoutes l’année active automatiquement
+        AnneeScolaire anneeActive = AnneeContext.get();
+        eleve.setAnneeScolaire(anneeActive);
+
 
         return eleveRepository.save(eleve);
     }

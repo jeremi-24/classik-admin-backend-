@@ -4,6 +4,7 @@ package skool.saas.skool.A_PRIMAIRE.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import skool.saas.skool.A_PRIMAIRE.Dto.PaiementDto;
+import skool.saas.skool.A_PRIMAIRE.Dto.PaiementRequestDto;
 import skool.saas.skool.A_PRIMAIRE.Entity.Eleve;
 import skool.saas.skool.A_PRIMAIRE.Entity.Paiement;
 import skool.saas.skool.A_PRIMAIRE.Entity.Scolarite;
@@ -12,6 +13,8 @@ import skool.saas.skool.A_PRIMAIRE.enums.StatutScolarite;
 import skool.saas.skool.A_PRIMAIRE.repository.EleveRepository;
 import skool.saas.skool.A_PRIMAIRE.repository.PaiementRepository;
 import skool.saas.skool.A_PRIMAIRE.repository.ScolariteRepository;
+import skool.saas.skool.GLOBALE.Entity.AnneeContext;
+import skool.saas.skool.GLOBALE.Entity.AnneeScolaire;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,61 +33,21 @@ public class PaiementService {
     @Autowired
     private EleveRepository eleveRepository;
 
-    public List<PaiementDto> getPaiementsParClasse(ClassePRIMAIRE classe) {
-        List<Eleve> eleves = eleveRepository.findByClasse(classe);
-        Optional<Scolarite> scolariteOpt = scolariteRepository.findByClasse(classe);
-
-        return eleves.stream().map(eleve -> {
-            PaiementDto dto = new PaiementDto();
-            dto.setEleveId(eleve.getId());
-            dto.setEleveNom(eleve.getNom());
-            dto.setElevePrenom(eleve.getPrenom());
-            dto.setClasse(classe);
-
-            Paiement dernierPaiement = paiementRepository
-                    .findTopByEleveOrderByDatePaiementDesc(eleve)
-                    .orElse(null);
-
-            double montantScolarite = scolariteOpt.map(s -> s.getMontant().doubleValue()).orElse(0.0);
-            dto.setMontantScolarite(montantScolarite);
-
-            if (dernierPaiement != null) {
-                dto.setDatePaiement(dernierPaiement.getDatePaiement());
-                dto.setMontantActuel(dernierPaiement.getMontantActuel().longValue());
-                dto.setMontantDejaPaye(dernierPaiement.getMontantDejaPaye().longValue());
-                dto.setResteEcolage(dernierPaiement.getResteEcolage().longValue());
-
-                // Déterminer le statut
-                if (dernierPaiement.getResteEcolage() != null && dernierPaiement.getResteEcolage() == 0.0) {
-                    dto.setStatut(StatutScolarite.SOLDÉ);
-                } else {
-                    dto.setStatut(StatutScolarite.EN_COURS);
-                }
-            } else {
-                dto.setMontantActuel(0);
-                dto.setMontantDejaPaye(0);
-                dto.setResteEcolage((long) montantScolarite);
-                dto.setStatut(StatutScolarite.EN_COURS);
-            }
-
-            return dto;
-        }).collect(Collectors.toList());
-    }
-
-
-    public String enregistrerPaiement(PaiementDto dto) {
-        Eleve eleve = eleveRepository.findById(dto.getEleveId())
+    public PaiementDto enregistrerPaiement(PaiementRequestDto dto) {
+        Eleve eleve = eleveRepository.findByNomAndPrenom(dto.getEleveNom(), dto.getElevePrenom())
                 .orElseThrow(() -> new RuntimeException("Élève introuvable"));
 
         Scolarite scolarite = scolariteRepository.findByClasse(eleve.getClasse())
-                .orElseThrow(() -> new RuntimeException("Montant scolarité introuvable pour cette classe"));
+                .orElseThrow(() -> new RuntimeException("Montant scolarité introuvable"));
+
+        AnneeScolaire anneeActive = AnneeContext.get();
 
         double montantScolarite = scolarite.getMontant().doubleValue();
-        Double dejaPaye = paiementRepository.sumMontantActuelByEleve(eleve);
+        Double dejaPaye = paiementRepository.sumMontantActuelByEleveAndAnnee(eleve, anneeActive);
         if (dejaPaye == null) dejaPaye = 0.0;
 
-        double nouveauMontant = dto.getMontantActuel();
-        double total = dejaPaye + nouveauMontant;
+        double montantActuel = dto.getMontantActuel();
+        double total = dejaPaye + montantActuel;
 
         if (total > montantScolarite) {
             throw new IllegalArgumentException("Le montant payé dépasse le reste à payer");
@@ -92,58 +55,117 @@ public class PaiementService {
 
         Paiement paiement = new Paiement();
         paiement.setEleve(eleve);
-        paiement.setDatePaiement(LocalDate.now());
-        paiement.setMontantActuel((double) nouveauMontant);
-        paiement.setMontantDejaPaye((double) (dejaPaye + nouveauMontant));
-        paiement.setResteEcolage((double) (montantScolarite - total));
-        paiement.setStatut((total == montantScolarite) ? StatutScolarite.SOLDÉ : StatutScolarite.EN_COURS);
-
+        paiement.setDatePaiement(dto.getDatePaiement());
+        paiement.setMontantActuel((long) montantActuel);
+        paiement.setMontantDejaPaye((long) total);
+        paiement.setResteEcolage((long) (montantScolarite - total));
+        paiement.setStatut(total == montantScolarite ? StatutScolarite.SOLDÉ : StatutScolarite.EN_COURS);
         paiement.setScolarite(scolarite);
+        paiement.setAnneeScolaire(anneeActive);
+
         paiementRepository.save(paiement);
 
-        return "Paiement enregistré avec succès";
+        // Construire et retourner la réponse DTO
+        PaiementDto response = new PaiementDto();
+        response.setEleveId(eleve.getId());
+        response.setEleveNom(eleve.getNom());
+        response.setElevePrenom(eleve.getPrenom());
+        response.setClasse(eleve.getClasse());
+        response.setDatePaiement(paiement.getDatePaiement());
+        response.setMontantActuel(paiement.getMontantActuel());
+        response.setMontantDejaPaye(paiement.getMontantDejaPaye());
+        response.setResteEcolage(paiement.getResteEcolage());
+        response.setStatut(paiement.getStatut());
+        response.setMontantScolarite(montantScolarite);
+
+        return response;
     }
 
 
     public PaiementDto getPaiementParEleveId(Long eleveId) {
+        // Récupération de l'élève
         Eleve eleve = eleveRepository.findById(eleveId)
                 .orElseThrow(() -> new RuntimeException("Élève non trouvé avec l'ID : " + eleveId));
 
+        // Récupération de sa classe
         ClassePRIMAIRE classe = eleve.getClasse();
-        Optional<Scolarite> scolariteOpt = scolariteRepository.findByClasse(classe);
 
+        // Recherche de la scolarité associée à la classe
+        Optional<Scolarite> scolariteOpt = scolariteRepository.findByClasse(classe);
+        double montantScolarite = scolariteOpt.map(s -> s.getMontant().doubleValue()).orElse(0.0);
+
+        // Préparation du DTO
         PaiementDto dto = new PaiementDto();
         dto.setEleveId(eleve.getId());
         dto.setEleveNom(eleve.getNom());
         dto.setElevePrenom(eleve.getPrenom());
         dto.setClasse(classe);
-
-        Paiement dernierPaiement = paiementRepository
-                .findTopByEleveOrderByDatePaiementDesc(eleve)
-                .orElse(null);
-
-        double montantScolarite = scolariteOpt.map(s -> s.getMontant().doubleValue()).orElse(0.0);
         dto.setMontantScolarite(montantScolarite);
 
-        if (dernierPaiement != null) {
-            dto.setDatePaiement(dernierPaiement.getDatePaiement());
-            dto.setMontantActuel(dernierPaiement.getMontantActuel().longValue());
-            dto.setMontantDejaPaye(dernierPaiement.getMontantDejaPaye().longValue());
-            dto.setResteEcolage(dernierPaiement.getResteEcolage().longValue());
+        // Récupération du dernier paiement (ordre par ID décroissant pour fiabilité)
+        Paiement dernierPaiement = paiementRepository
+                .findTopByEleveOrderByIdDesc(eleve)
+                .orElse(null);
 
-            if (dernierPaiement.getResteEcolage() != null && dernierPaiement.getResteEcolage() == 0.0) {
-                dto.setStatut(StatutScolarite.SOLDÉ);
-            } else {
-                dto.setStatut(StatutScolarite.EN_COURS);
-            }
+        if (dernierPaiement != null) {
+            // Paiement trouvé : remplir les infos
+            dto.setDatePaiement(dernierPaiement.getDatePaiement());
+            dto.setMontantActuel(dernierPaiement.getMontantActuel());
+            dto.setMontantDejaPaye(dernierPaiement.getMontantDejaPaye());
+            dto.setResteEcolage(dernierPaiement.getResteEcolage());
+
+            Long reste = dernierPaiement.getResteEcolage();
+            boolean estSolde = (reste != null && reste == 0);
+            dto.setStatut(estSolde ? StatutScolarite.SOLDÉ : StatutScolarite.EN_COURS);
         } else {
-            dto.setMontantActuel(0);
+            // Aucun paiement existant
             dto.setMontantDejaPaye(0);
             dto.setResteEcolage((long) montantScolarite);
             dto.setStatut(StatutScolarite.EN_COURS);
+            dto.setDatePaiement(null); // optionnel
         }
 
         return dto;
+    }
+
+
+    public List<PaiementDto> getPaiementsParClasse(ClassePRIMAIRE classe) {
+        List<Eleve> eleves = eleveRepository.findByClasse(classe);
+        Optional<Scolarite> scolariteOpt = scolariteRepository.findByClasse(classe);
+        double montantScolarite = scolariteOpt.map(s -> s.getMontant().doubleValue()).orElse(0.0);
+
+        return eleves.stream().map(eleve -> {
+            PaiementDto dto = new PaiementDto();
+            dto.setEleveId(eleve.getId());
+            dto.setEleveNom(eleve.getNom());
+            dto.setElevePrenom(eleve.getPrenom());
+            dto.setClasse(classe);
+            dto.setMontantScolarite(montantScolarite);
+
+            // Récupération du dernier paiement inséré pour chaque élève
+            Paiement dernierPaiement = paiementRepository
+                    .findTopByEleveOrderByIdDesc(eleve)
+                    .orElse(null);
+
+            if (dernierPaiement != null) {
+                dto.setDatePaiement(dernierPaiement.getDatePaiement());
+                dto.setMontantActuel(dernierPaiement.getMontantActuel());
+                dto.setMontantDejaPaye(dernierPaiement.getMontantDejaPaye());
+                dto.setResteEcolage(dernierPaiement.getResteEcolage());
+
+                Long reste = dernierPaiement.getResteEcolage();
+                boolean estSolde = reste != null && reste == 0;
+                dto.setStatut(estSolde ? StatutScolarite.SOLDÉ : StatutScolarite.EN_COURS);
+            } else {
+                dto.setMontantActuel(0);
+                dto.setMontantDejaPaye(0);
+                dto.setResteEcolage((long) montantScolarite);
+                dto.setStatut(StatutScolarite.EN_COURS);
+                dto.setDatePaiement(null); // si tu veux l'afficher
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
     }
 
 }

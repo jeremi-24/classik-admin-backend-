@@ -145,5 +145,9 @@ public class CollegeController {
         return ResponseEntity.ok(scolariteCollegeService.getByClasse(classe));
     }
 
+
+    // // // // // // // // // // // // // // // // // // // // // // //
+    // // // // //// // //  Matiere
+
     
 }

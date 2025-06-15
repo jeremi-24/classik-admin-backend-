@@ -3,7 +3,7 @@ package skool.saas.skool.A_PRIMAIRE.Entity;
 import jakarta.persistence.*;
 import skool.saas.skool.A_PRIMAIRE.enums.ClassePRIMAIRE;
 @Entity
-@Table(name = "ProfPrimaire")
+@Table(name = "PrimaireProfesseur")
 public class Professeur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

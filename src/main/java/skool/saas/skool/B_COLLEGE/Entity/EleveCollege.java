@@ -2,10 +2,11 @@ package skool.saas.skool.B_COLLEGE.Entity;
 
 import jakarta.persistence.*;
 import skool.saas.skool.B_COLLEGE.enums.ClasseCOLLEGE;
+import skool.saas.skool.GLOBALE.Entity.AnneeScolaire;
 
 import java.time.LocalDate;
 @Entity
-@Table(name = "EleveCollege")
+@Table(name = "CollegeEleve")
 
 public class EleveCollege {
 
@@ -64,6 +65,9 @@ public class EleveCollege {
 
     }
 
+
+    @ManyToOne
+    private AnneeScolaire anneeScolaire;
 
     // Getters et Setters...
     public Long getId() {
@@ -169,5 +173,13 @@ public class EleveCollege {
 
     public void setTuteurCollege(TuteurCollege tuteurCollege) {
         this.tuteurCollege = tuteurCollege;
+    }
+
+    public AnneeScolaire getAnneeScolaire() {
+        return anneeScolaire;
+    }
+
+    public void setAnneeScolaire(AnneeScolaire anneeScolaire) {
+        this.anneeScolaire = anneeScolaire;
     }
 }

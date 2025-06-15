@@ -4,12 +4,13 @@ import jakarta.persistence.*;
 import lombok.Data;
 import skool.saas.skool.A_PRIMAIRE.enums.ClassePRIMAIRE;
 import skool.saas.skool.A_PRIMAIRE.enums.StatutScolarite;
+import skool.saas.skool.GLOBALE.Entity.AnneeScolaire;
 
 import java.time.LocalDate;
 
 @Data
 @Entity
-@Table(name = "PaiementPrimaire")
+@Table(name = "PrimairePaiement")
 
 public class Paiement {
     @Id
@@ -17,9 +18,9 @@ public class Paiement {
     private Long id;
 
     private LocalDate datePaiement;
-    private Double resteEcolage;
-    private Double montantDejaPaye;
-    private Double montantActuel;
+    private long resteEcolage;
+    private long montantDejaPaye;
+    private long montantActuel;
 
 
     @ManyToOne
@@ -36,6 +37,9 @@ public class Paiement {
 
     @Enumerated(EnumType.STRING)
     private StatutScolarite statut;
+
+    @ManyToOne
+    private AnneeScolaire anneeScolaire;
 
 
     public Long getId() {
@@ -54,27 +58,27 @@ public class Paiement {
         this.datePaiement = datePaiement;
     }
 
-    public Double getResteEcolage() {
+    public long getResteEcolage() {
         return resteEcolage;
     }
 
-    public void setResteEcolage(Double resteEcolage) {
+    public void setResteEcolage(long resteEcolage) {
         this.resteEcolage = resteEcolage;
     }
 
-    public Double getMontantDejaPaye() {
+    public long getMontantDejaPaye() {
         return montantDejaPaye;
     }
 
-    public void setMontantDejaPaye(Double montantDejaPaye) {
+    public void setMontantDejaPaye(long montantDejaPaye) {
         this.montantDejaPaye = montantDejaPaye;
     }
 
-    public Double getMontantActuel() {
+    public long getMontantActuel() {
         return montantActuel;
     }
 
-    public void setMontantActuel(Double montantActuel) {
+    public void setMontantActuel(long montantActuel) {
         this.montantActuel = montantActuel;
     }
 
@@ -108,5 +112,13 @@ public class Paiement {
 
     public void setStatut(StatutScolarite statut) {
         this.statut = statut;
+    }
+
+    public AnneeScolaire getAnneeScolaire() {
+        return anneeScolaire;
+    }
+
+    public void setAnneeScolaire(AnneeScolaire anneeScolaire) {
+        this.anneeScolaire = anneeScolaire;
     }
 }

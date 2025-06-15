@@ -3,7 +3,7 @@ package skool.saas.skool.A_PRIMAIRE.Entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "TuteurPrimaire")
+@Table(name = "PrimaireTuteur")
 public class Tuteur {
 
     @Id

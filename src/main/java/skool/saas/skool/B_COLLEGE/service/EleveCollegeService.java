@@ -10,6 +10,8 @@ import skool.saas.skool.B_COLLEGE.Entity.TuteurCollege;
 import skool.saas.skool.B_COLLEGE.enums.ClasseCOLLEGE;
 import skool.saas.skool.B_COLLEGE.repository.EleveCollegeRepository;
 import skool.saas.skool.B_COLLEGE.repository.TuteurCollegeRepository;
+import skool.saas.skool.GLOBALE.Entity.AnneeContext;
+import skool.saas.skool.GLOBALE.Entity.AnneeScolaire;
 
 
 import java.util.ArrayList;
@@ -64,6 +66,9 @@ public class EleveCollegeService {
 
         eleve.setTuteurCollege(tuteur);
 
+        // ✅ Affectation automatique de l’année scolaire active
+        AnneeScolaire anneeActive = AnneeContext.get();
+        eleve.setAnneeScolaire(anneeActive);
         return eleveCollegeRepository.save(eleve);
     }
 

@@ -7,10 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import skool.saas.skool.A_PRIMAIRE.Dto.ClasseStatistiqueDto;
-import skool.saas.skool.A_PRIMAIRE.Dto.EleveDto;
-import skool.saas.skool.A_PRIMAIRE.Dto.PaiementDto;
-import skool.saas.skool.A_PRIMAIRE.Dto.TuteurSimpleDto;
+import skool.saas.skool.A_PRIMAIRE.Dto.*;
 import skool.saas.skool.A_PRIMAIRE.Entity.Eleve;
 import skool.saas.skool.A_PRIMAIRE.Entity.Matiere;
 import skool.saas.skool.A_PRIMAIRE.Entity.Professeur;
@@ -145,57 +142,18 @@ public class PrimaireController {
         return ResponseEntity.ok(updated);
     }
 
-    // // // // // // // // // // // // // // // // // // // // // // //
-    // // // // //// // //  Professeur
-    @Operation(summary = "ajout de prof")
-    @PostMapping("/prof")
-    public ResponseEntity<Professeur> createProf(@RequestBody Professeur prof) {
-        Professeur saved = professeurService.saveProfesseur(prof);
-        return ResponseEntity.ok(saved);
+    @Operation(summary = "get les scolarites")
+    @GetMapping("/scolarite")
+    public List<Scolarite> getAllScolarites() {
+        return scolariteService.getAllScolarites();
     }
 
-    @Operation(summary = "put prof par son id")
-    @PutMapping("/prof/{id}")
-    public ResponseEntity<Professeur> updateProf(@PathVariable Long id, @RequestBody Professeur prof) {
-        Professeur updated = professeurService.updateProfesseur(id, prof);
-        return ResponseEntity.ok(updated);
-    }
-
-    @Operation(summary = "delete prof par son id")
-    @DeleteMapping("/prof/{id}")
-    public ResponseEntity<Void> deleteProf(@PathVariable Long id) {
-        professeurService.deleteProfesseur(id);
-        return ResponseEntity.noContent().build();
-    }
-
-
-    // // // // // // // // // // // // // // // // // // // // // // //
-    // // // // //// // //  Paiement
-    @Operation(summary = "get les paiement")
-    @GetMapping("/paiement/{classe}")
-    public List<PaiementDto> getPaiementsParClasse(@PathVariable ClassePRIMAIRE classe) {
-        return paiementService.getPaiementsParClasse(classe);
-    }
-
-    @Operation(summary = "post un paiement")
-    @PostMapping("/paiement")
-    public ResponseEntity<?> enregistrerPaiement(@RequestBody PaiementDto dto) {
-        try {
-            String message = paiementService.enregistrerPaiement(dto);
-            return ResponseEntity.ok(Collections.singletonMap("message", message));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("error", "Erreur serveur"));
-        }
-    }
-
-    @Operation(summary = "get les paiement by id")
-    @GetMapping("/paiement/eleve/{eleveId}")
-    public ResponseEntity<PaiementDto> getPaiementParEleve(@PathVariable Long eleveId) {
-        PaiementDto dto = paiementService.getPaiementParEleveId(eleveId);
-        return ResponseEntity.ok(dto);
+    @Operation(summary = "get scolarite by classe")
+    @GetMapping("/scolarite/{classe}")
+    public ResponseEntity<Scolarite> getScolariteByClasse(@RequestParam ClassePRIMAIRE classe) {
+        return scolariteService.getScolariteByClasse(classe)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
 
@@ -227,5 +185,74 @@ public class PrimaireController {
         matiereService.deleteMatiere(id);
         return ResponseEntity.noContent().build();
     }
+
+
+    // // // // // // // // // // // // // // // // // // // // // // //
+    // // // // //// // //  Professeur
+    @Operation(summary = "ajout de prof")
+    @PostMapping("/prof")
+    public ResponseEntity<Professeur> createProf(@RequestBody Professeur prof) {
+        Professeur saved = professeurService.saveProfesseur(prof);
+        return ResponseEntity.ok(saved);
+    }
+
+    @Operation(summary = "put prof par son id")
+    @PutMapping("/prof/{id}")
+    public ResponseEntity<Professeur> updateProf(@PathVariable Long id, @RequestBody Professeur prof) {
+        Professeur updated = professeurService.updateProfesseur(id, prof);
+        return ResponseEntity.ok(updated);
+    }
+
+    @Operation(summary = "delete prof par son id")
+    @DeleteMapping("/prof/{id}")
+    public ResponseEntity<Void> deleteProf(@PathVariable Long id) {
+        professeurService.deleteProfesseur(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    // // // // // // // // // // // // // // // // // // // // // // //
+    // // // // //// // //  Paiement
+    @Operation(summary = "post un paiement")
+    @PostMapping("/paiement")
+    public ResponseEntity<PaiementDto> enregistrerPaiement(@RequestBody PaiementRequestDto dto) {
+        try {
+            PaiementDto paiementDto = paiementService.enregistrerPaiement(dto);
+            return ResponseEntity.ok(paiementDto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+    @Operation(summary = "get les paiement by id")
+    @GetMapping("/paiement/{eleveId}")
+    public ResponseEntity<PaiementDto> getPaiementParEleveId(@PathVariable Long eleveId) {
+        try {
+            PaiementDto dto = paiementService.getPaiementParEleveId(eleveId);
+            return ResponseEntity.ok(dto);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build(); // ou badRequest selon le message
+        }
+    }
+
+
+    @Operation(summary = "get les paiements d'une classe")
+    @GetMapping("/paiement/eleve/{classe}")
+    public ResponseEntity<?> getPaiementsParClasse(@PathVariable ClassePRIMAIRE classe) {
+        try {
+            List<PaiementDto> paiements = paiementService.getPaiementsParClasse(classe);
+            return ResponseEntity.ok(paiements);
+        } catch (Exception e) {
+            e.printStackTrace(); // Log dans la console
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", e.getMessage()));
+        }
+    }
+
+
+
 
 }

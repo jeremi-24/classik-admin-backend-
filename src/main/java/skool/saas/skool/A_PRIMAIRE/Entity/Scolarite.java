@@ -2,9 +2,10 @@ package skool.saas.skool.A_PRIMAIRE.Entity;
 
 import jakarta.persistence.*;
 import skool.saas.skool.A_PRIMAIRE.enums.ClassePRIMAIRE;
+import skool.saas.skool.GLOBALE.Entity.AnneeScolaire;
 
 @Entity
-@Table(name = "ScolaritePrimaire")
+@Table(name = "PrimaireScolarite")
 public class Scolarite {
 
     @Id
@@ -17,6 +18,9 @@ public class Scolarite {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ClassePRIMAIRE classe;
+
+    @ManyToOne
+    private AnneeScolaire anneeScolaire;
 
 
     public Long getId() {
@@ -42,5 +46,14 @@ public class Scolarite {
     public void setClasse(ClassePRIMAIRE classe) {
         this.classe = classe;
     }
+
+    public AnneeScolaire getAnneeScolaire() {
+        return anneeScolaire;
+    }
+
+    public void setAnneeScolaire(AnneeScolaire anneeScolaire) {
+        this.anneeScolaire = anneeScolaire;
+    }
+
 
 }

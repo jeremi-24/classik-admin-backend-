@@ -23,19 +23,6 @@ public class UtilisateurService {
     @Autowired
     private ConfigurationService configurationService;
 
-
-    public boolean authenticate(String email, String password, Role role) {
-        // Vérifier si la licence est encore valide
-        if (!configurationService.licenceEstValide()) {
-            return false; // On bloque la connexion
-        }
-
-        // Si la licence est valide, on continue normalement
-        Utilisateur utilisateur = utilisateurRepository.findByEmailAndPasswordAndRole(email, password, role);
-        return utilisateur != null;
-    }
-
-
     public String getRoleByEmail(String email) {
         Utilisateur utilisateur = utilisateurRepository.findByEmail(email);
         if (utilisateur != null && utilisateur.getRole() != null) {
@@ -44,9 +31,32 @@ public class UtilisateurService {
         return null;
     }
 
+
+//    public boolean authenticate(String email, String password, Role role) {
+//        // Vérifier si la licence est encore valide
+//        if (!configurationService.licenceEstValide()) {
+//            return false; // On bloque la connexion
+//        }
+//
+//        // Si la licence est valide, on continue normalement
+//        Utilisateur utilisateur = utilisateurRepository.findByEmailAndPasswordAndRole(email, password, role);
+//        return utilisateur != null;
+//    }
+//
+//
+//    public Utilisateur saveUtilisateur(Utilisateur utilisateur) {
+//        return utilisateurRepository.save(utilisateur);
+//    }
+
+    
+    public Utilisateur findByEmailAndPassword(String email, String password) {
+        return utilisateurRepository.findByEmailAndPassword(email, password);
+    }
+
     public Utilisateur saveUtilisateur(Utilisateur utilisateur) {
         return utilisateurRepository.save(utilisateur);
     }
+
 
     @Transactional
     public Utilisateur updateUtilisateur(Long id, Utilisateur updatedData) {

@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import skool.saas.skool.B_COLLEGE.Entity.ScolariteCollege;
 import skool.saas.skool.B_COLLEGE.enums.ClasseCOLLEGE;
 import skool.saas.skool.B_COLLEGE.repository.ScolariteCollegeRepository;
+import skool.saas.skool.GLOBALE.Entity.AnneeContext;
+import skool.saas.skool.GLOBALE.Entity.AnneeScolaire;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +22,10 @@ public class ScolariteCollegeService {
         if (existing.isPresent()) {
             throw new IllegalStateException("Une scolarité existe déjà pour la classe : " + scolarite.getClasse());
         }
+
+        AnneeScolaire anneeActive = AnneeContext.get();
+        scolarite.setAnneeScolaire(anneeActive);
+
         return scolariteCollegeRepository.save(scolarite);
     }
 

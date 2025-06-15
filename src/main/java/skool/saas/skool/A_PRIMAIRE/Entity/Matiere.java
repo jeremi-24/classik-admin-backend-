@@ -1,14 +1,12 @@
 package skool.saas.skool.A_PRIMAIRE.Entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Setter;
 
 @Entity
 @Data
+@Table(name = "PrimaireMatiere")
+
 public class Matiere {
 
     @Id
@@ -16,6 +14,7 @@ public class Matiere {
     private Long id;
 
     private String nom;
+
 
     public Matiere() {}
 
