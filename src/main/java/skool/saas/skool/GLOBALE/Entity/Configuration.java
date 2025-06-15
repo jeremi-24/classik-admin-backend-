@@ -14,14 +14,14 @@ public class Configuration {
 
     private String nom;
     private String adresse;
-    private String devise;
     private String tel;
     private String cel;
     private String bp;
+    private String devise;
+
     @Lob
     private byte[] image;
-    private Date licenceExpire;
-    private Date licenceDebut;
+
 
 
     public Long getId() {
@@ -88,19 +88,4 @@ public class Configuration {
         this.image = image;
     }
 
-    public Date getLicenceExpire() {
-        return licenceExpire;
-    }
-
-    public void setLicenceExpire(Date licenceExpire) {
-        this.licenceExpire = licenceExpire;
-    }
-
-    public Date getLicenceDebut() {
-        return licenceDebut;
-    }
-
-    public void setLicenceDebut(Date licenceDebut) {
-        this.licenceDebut = licenceDebut;
-    }
 }

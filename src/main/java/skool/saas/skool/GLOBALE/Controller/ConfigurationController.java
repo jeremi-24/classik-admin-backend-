@@ -14,20 +14,20 @@ import java.util.List;
 @Tag(name = "Configuration", description = "Gestion de la configuration")
 
 @RestController
-@RequestMapping("/configuration")
+@RequestMapping("/ecole")
 public class ConfigurationController {
 
     @Autowired
     private ConfigurationService configurationService;
 
-    @Operation(summary = "Ajouter une configuration")
+    @Operation(summary = "Ajouter une ecole")
     @PostMapping
     public ResponseEntity<Configuration> saveConfiguration(@RequestBody Configuration config) {
         Configuration savedConfig = configurationService.saveConfiguration(config);
         return ResponseEntity.ok(savedConfig);
     }
 
-    @Operation(summary = "Modifier une configuration")
+    @Operation(summary = "Modifier une ecole")
     @PutMapping("/{id}")
     public ResponseEntity<Configuration> updateConfiguration(
             @PathVariable Long id,
@@ -38,7 +38,7 @@ public class ConfigurationController {
 
 
 
-    @Operation(summary = "Recuperer une configuration")
+    @Operation(summary = "Recuperer une ecole")
     @GetMapping
     public List<Configuration> getAllConfigurations() {
         return configurationService.getAllConfigurations();
@@ -52,7 +52,7 @@ public class ConfigurationController {
 //        return config.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
 //    }
 
-    @Operation(summary = "GET image d une configuration")
+    @Operation(summary = "GET image d une ecole")
     @GetMapping("/image")
     public ResponseEntity<byte[]> getImage() {
         byte[] image = configurationService.getImage();

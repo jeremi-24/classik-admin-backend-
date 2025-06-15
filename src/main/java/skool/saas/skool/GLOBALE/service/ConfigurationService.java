@@ -33,8 +33,7 @@ public class ConfigurationService {
         existing.setCel(config.getCel());
         existing.setBp(config.getBp());
         existing.setImage(config.getImage());
-        existing.setLicenceDebut(config.getLicenceDebut());
-        existing.setLicenceExpire(config.getLicenceExpire());
+
 
         return configurationRepository.save(existing);
     }
@@ -59,19 +58,6 @@ public class ConfigurationService {
     }
 
 
-    //Licence
-    public boolean licenceEstValide() {
-        List<Configuration> configurations = configurationRepository.findAll();
-        if (configurations.isEmpty()) {
-            return false; // Pas de configuration, donc licence invalide
-        }
-
-        Configuration config = configurations.get(0); // On prend la première configuration
-        Date aujourdHui = new Date();
-
-        // La licence est valide si on est entre licenceDebut et licenceExpire
-        return aujourdHui.after(config.getLicenceDebut()) && aujourdHui.before(config.getLicenceExpire());
-    }
 
 
 

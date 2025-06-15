@@ -48,7 +48,7 @@ public class UtilisateurService {
 //        return utilisateurRepository.save(utilisateur);
 //    }
 
-    
+
     public Utilisateur findByEmailAndPassword(String email, String password) {
         return utilisateurRepository.findByEmailAndPassword(email, password);
     }
