@@ -21,7 +21,6 @@ public class ConfigurationService {
         return configurationRepository.save(config);
     }
 
-    @Transactional
     public Configuration updateConfiguration(Long id, Configuration config) {
         Configuration existing = configurationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Configuration non trouvée avec l’ID: " + id));
@@ -37,6 +36,7 @@ public class ConfigurationService {
 
         return configurationRepository.save(existing);
     }
+    @Transactional
 
     // Récupérer toutes les configurations
     public List<Configuration> getAllConfigurations() {

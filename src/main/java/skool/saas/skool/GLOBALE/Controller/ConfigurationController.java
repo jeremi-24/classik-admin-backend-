@@ -7,8 +7,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import skool.saas.skool.GLOBALE.Dto.SystemAnneeResponse;
 import skool.saas.skool.GLOBALE.Entity.Configuration;
 import skool.saas.skool.GLOBALE.service.ConfigurationService;
+import skool.saas.skool.GLOBALE.service.SystemAnneeScolaireViewService;
 
 import java.util.List;
 @Tag(name = "Configuration", description = "Gestion de la configuration")
@@ -19,6 +21,10 @@ public class ConfigurationController {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private SystemAnneeScolaireViewService viewService;
+
 
     @Operation(summary = "Ajouter une ecole")
     @PostMapping
@@ -65,5 +71,11 @@ public class ConfigurationController {
         headers.add("Content-Type", "image/png"); // Modifier selon le format réel de l'image (ex: image/jpeg)
 
         return new ResponseEntity<>(image, headers, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/api")
+    public SystemAnneeResponse getSystemeEtAnneeActive() {
+        return viewService.getSystemeEtAnnee();
     }
 }

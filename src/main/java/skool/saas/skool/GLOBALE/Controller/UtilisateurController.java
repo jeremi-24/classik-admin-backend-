@@ -47,58 +47,7 @@ public class UtilisateurController {
         return ResponseEntity.ok(utilisateurs);
     }
 
-//    // Authentification utilisateur
-//    @Operation(summary = "Connexion ")
-//    @PostMapping("/login")
-//    public ResponseEntity<Map<String, Object>> login(@RequestBody Utilisateur utilisateur) {
-//        Map<String, Object> response = new HashMap<>();
-//
-//        // 👮 Vérifie d'abord si le rôle est bien présent
-//        if (utilisateur.getRole() == null) {
-//            response.put("success", false);
-//            response.put("message", "Rôle manquant !");
-//            return ResponseEntity.badRequest().body(response);
-//        }
-//
-//        // 🔒 Licence valide ?
-//        if (!configurationService.licenceEstValide()) {
-//            response.put("success", false);
-//            response.put("message", "Licence expirée. Veuillez contacter l’administration.");
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-//        }
-//
-//        // 🧪 Affiche les infos pour debug
-//        System.out.println("🧪 Email : " + utilisateur.getEmail());
-//        System.out.println("🧪 Password : " + utilisateur.getPassword());
-//        System.out.println("🧪 Role : " + utilisateur.getRole());
-//
-//        boolean isAuthenticated = utilisateurService.authenticate(
-//                utilisateur.getEmail(),
-//                utilisateur.getPassword(),
-//                utilisateur.getRole()
-//        );
-//
-//        if (isAuthenticated) {
-//            String token = jwtUtil.generateToken(utilisateur.getEmail(), utilisateur.getRole().name());
-//            response.put("success", true);
-//            response.put("token", token);
-//            response.put("message", "Login réussi");
-//            response.put("role", utilisateur.getRole());
-//            return ResponseEntity.ok(response);
-//        } else {
-//            response.put("success", false);
-//            response.put("message", "Identifiants ou rôle incorrects");
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-//        }
-//    }
-//
-//    @Operation(summary = "inscription d'un compte")
-//    @PostMapping("/save")
-//    public ResponseEntity<Utilisateur> saveUtilisateur(@RequestBody Utilisateur utilisateur) {
-//        Utilisateur savedUser = utilisateurService.saveUtilisateur(utilisateur);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
-//    }
-
+    
     // ✅ Connexion simplifiée : email + password
     @Operation(summary = "Connexion")
     @PostMapping("/login")
